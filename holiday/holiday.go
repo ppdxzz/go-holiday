@@ -48,40 +48,26 @@ func checkDate(date string) error {
 	return nil
 }
 
-// IsHoliday 是否节假日
-func IsHoliday(date string) (bool, error) {
+// IsHoliday 判断是否节假日，第一个入参表示`2006-01-02`的日期字符串，第二个入参表示是否包含双休
+func IsHoliday(date string, isInclude bool) (bool, error) {
 	if err := checkDate(date); err != nil {
 		return false, err
 	}
 	value, exists := holidayMap[date]
-	if exists && value == "0" {
+	if exists && (value == "0" || (isInclude && value == "2")) {
 		return true, nil
 	} else {
 		return false, nil
 	}
 }
 
-// IsWeekend 是否双休
-func IsWeekend(date string) (bool, error) {
-	if err := checkDate(date); err != nil {
-		return false, err
-	}
-	value, exists := holidayMap[date]
-	if exists && value == "2" {
-		return true, nil
-	} else {
-		return false, nil
-	}
-}
-
-// IsWeekday 是否工作日
+// IsWeekday 判断是否工作日，入参表示`2006-01-02`的日期字符串
 func IsWeekday(date string) (bool, error) {
 	if err := checkDate(date); err != nil {
 		return false, err
 	}
-	isHoliday, _ := IsHoliday(date)
-	isWeekend, _ := IsWeekend(date)
-	if !isHoliday && !isWeekend {
+	value, exists := holidayMap[date]
+	if !exists || exists && value == "1" {
 		return true, nil
 	}
 	return false, nil
